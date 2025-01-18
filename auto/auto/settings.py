@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'parking_app.apps.ParkingAppConfig',
     'rest_framework',
     'auto_app.apps.AutoAppConfig',
+    'news_app.apps.NewsAppConfig',
 ]
 
 MIDDLEWARE = [

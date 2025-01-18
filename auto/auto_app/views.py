@@ -18,5 +18,5 @@ class AutoListView(ListCreateAPIView):
 class AutoRUDView(RetrieveUpdateDestroyAPIView):
     queryset = BaseAuto.objects.all()
     serializer_class = AutoSerializer
-    lookup_field = 'id'
+    lookup_field = 'pk'
 

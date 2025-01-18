@@ -30,7 +30,7 @@ class BaseAuto(models.Model):
     model = models.ForeignKey(AutoModel, on_delete=models.CASCADE, verbose_name='Модель авто')
 
     def __str__(self):
-        return self.brand + ' ' + self.model
+        return f'{self.brand} {self.model}'
 
 
     class Meta:
