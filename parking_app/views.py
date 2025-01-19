@@ -35,22 +35,41 @@ class InParkingViewSet(generics.CreateAPIView): #въезд машины
         return super().clean(request, *args, **kwargs)
 
 
-    def save(self, request, *args, **kwargs):
-        """Сохраниние данных в БД."""
-        if self.request.method == 'POST':
-            self.clean(request, *args, **kwargs)
-        return super().save(request, *args, **kwargs)
+
 
 
 #-----------------------------------
-    def control_free_place(self):
+    def in_and_out_parking_place(self):
         """Проверка наличия свободных мест."""
-        if Parking.objects.filter(time_out__isnull=False).count() >= 500:
-            raise ValidationError('Нет свободных мест')
+        base_count_parking_place = len(Parking.number_place_bool)
+        occupied_places = Parking.objects.filter(time_out__isnull=True).count()  # Подсчет занятых мест
+        free_place = base_count_parking_place - occupied_places                  # Подсчет свободных мест
+
+        if free_place > 0:
+            return f'Свободных мест: {free_place} Занятых мест: {occupied_places}, вы можете проехать на {occupied_places + 1}.'
+        elif free_place == 0:
+            return f'Все места свободны, проедьте на 1 место.'
         else:
-            return f'Свободных мест: {500 - Parking.objects.filter(time_out__isnull=False).count()}'
+            return 'Свободных мест нет.'
 
 
+# def in_and_out_parking_place(self):
+#     """Проверка наличия свободных мест."""
+#     base_count_parking_place = len(Parking.number_place_bool)
+#     free_place = 0
+#     closed_place = 0
+#     if Parking.objects.filter(time_in__isnull=False):
+#         free_place = base_count_parking_place - 1
+#         closed_place += 1
+#         return f'Свободных мест: {free_place} Занятых мест: {closed_place}, вы можете проехать на {closed_place + 1} место'
+#
+#     if Parking.objects.filter(time_out__isnull=False):
+#         free_place += 1
+#         closed_place -= 1
+#         return f'Свободных мест: {free_place} Занятых мест: {closed_place}'
+#
+#     if closed_place == base_count_parking_place:
+#         return f'Свободных мест нет'
 
 
 #-----------------------------------

@@ -19,7 +19,7 @@ class Parking(models.Model):
 
 
     def __str__(self):
-        return str(self.time_in) + str(self.time_out)
+        return f'Номер машины: {self.car_number} Время въезда: {self.time_in} Время выезда: {self.time_out} Оплата: {self.pay} Номер места: {self.number_place}'
 
     class Meta:
         verbose_name = 'Парковка'

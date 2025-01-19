@@ -8,7 +8,7 @@ from . serializers import AutoSerializer
 
 
 def index(request):
-    return HttpResponse("Hello, world. You're at the auto index.")
+    return HttpResponse("Hello, world. You're at the auto1 index.")
 
 class AutoListView(ListCreateAPIView):
     queryset = BaseAuto.objects.all()
