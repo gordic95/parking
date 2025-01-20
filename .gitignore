@@ -173,3 +173,4 @@ cython_debug/
 
 #Игнор БД
 db.sqlite3
+.idea/

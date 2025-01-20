@@ -10,8 +10,3 @@ class ParkingSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-    def save(self, request, *args, **kwargs):
-        """Сохраниние данных в БД."""
-        if self.request.method == 'POST':
-            self.clean(request, *args, **kwargs)
-        return super().save(request, *args, **kwargs)

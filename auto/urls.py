@@ -5,7 +5,7 @@ app_name = 'auto1'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('auto1/', include('auto_app.urls')),
+    path('auto/', include('auto_app.urls')),
     path('parking/', include('parking_app.urls')),
     path('news/', include('news_app.urls')),
 ]
