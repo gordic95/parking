@@ -75,27 +75,25 @@ class OutParkingView(generics.RetrieveUpdateDestroyAPIView): #выезд маш�
         """Подсчет стоимости пребывания машины на парковке."""
         if not self.time_out:
             raise ValueError("Выезд еще не зафиксирован.")
-
         time = self.time_out - self.time_in
         hours = int(time.total_seconds() / 3600)
-
         if hours <= 1:
             money = ONE_HOUR_COST
         else:
             money = MORE_ONE_HOUR_COST * hours
-
         return money
 
 
-    # def update(self, request, *args, **kwargs):
-    #     """Выезд, проверка, подсчет стоимости и оплата."""
-    #     instance = self.get_object()
-    #
-    #     if not instance.pay:
-    #         return Response({'message': 'Проезд еще не оплачена'}, status=status.HTTP_400_BAD_REQUEST)
-    #
-    #     instance.time_out = timezone.now()
-    #     instance.save()
-    #     money = instance.calculate_money()
-    #     return Response({'message': f'Выезд разрешен. Сумма к оплате: {money} руб.'}, status=status.HTTP_200_OK)
+    def update(self, request, *args, **kwargs):
+        """Выезд, проверка, подсчет стоимости и оплата."""
+        instance = self.get_object()     #получаем обьект с которым будем работать
+
+        if not instance.pay:
+            return Response({'message': 'Проезд еще не оплачена'}, status=status.HTTP_400_BAD_REQUEST)
+
+        instance.time_out = timezone.now()  #меняем время выезда на время, которое сейчас
+        NUMBER_PLACE_BOOL[instance.number_place] = False   #освобождаем место на парковке нашей  воображаемой БД
+        instance.save() #сохраняем
+        money = instance.calculate_money()   #применяем метод для расчет оплаты
+        return Response({'message': f'Выезд разрешен. Сумма к оплате: {money} руб. Место {instance.number_place} освободилось'}, status=status.HTTP_200_OK)
 
