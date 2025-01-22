@@ -30,17 +30,17 @@ class InParkingViewSet(generics.ListCreateAPIView): #въезд машины
         parking_data = {
             'car_number': request.data.get('car_number'),
             'time_in': request.data.get('time_in'),
-            'time_out': request.data.get('time_out'),
-            'pay': request.data.get('pay'),
+            # 'time_out': request.data.get('time_out'),   # эти поля нам не нужны на вьезде, поэтому их не заполняем
+            # 'pay': request.data.get('pay'),
             'number_place': number_place
         }
 
-        serializer = self.get_serializer(data=parking_data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
+        serializer = self.get_serializer(data=parking_data)  #получаем сериалайзер с нашими данными из parking_data
+        serializer.is_valid(raise_exception=True)    #проверяем эти данные на верность
+        self.perform_create(serializer)      #если все ок, сохраняем их
         headers = self.get_success_headers(serializer.data)
 
-        return Response({'message': 'Машина успешно зарегистрирована на парковке'}, status=status.HTTP_201_CREATED, headers=headers)
+        return Response({'message': 'Машина успешно зарегистрирована на парковке.'}, status=status.HTTP_201_CREATED, headers=headers)
 
 
     def perform_create(self, serializer):
