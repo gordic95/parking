@@ -21,6 +21,9 @@ class Post(models.Model):
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата редактирования')
     category = models.ForeignKey('Category', on_delete=models.CASCADE, verbose_name='Категория', null=True, blank=True)
     author = models.ForeignKey('Author', on_delete=models.CASCADE, verbose_name='Автор', null=True, blank=True)
+    # images = models.ImageField(null=True, blank=True, verbose_name='Изображение')
+    slug = models.SlugField(max_length=50, null=True, blank=True, verbose_name='Слаг')
+
 
 
 
@@ -29,6 +32,7 @@ class Post(models.Model):
         return f'{self.title} {self.created_at}'
 
     class Meta:
+        db_table = 'posts'
         verbose_name = 'Новость'
         verbose_name_plural = 'Новости'
 
@@ -40,6 +44,7 @@ class Category(models.Model):
         ('Спорт', 'Спорт'),
     ]
     name = models.CharField(max_length=100, verbose_name='Категория', choices=cat)
+    slug = models.SlugField(max_length=50, null=True, blank=True, verbose_name='Слаг')
 
     def __str__(self):
         return self.name

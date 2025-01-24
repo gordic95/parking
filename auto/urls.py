@@ -3,13 +3,7 @@ from django.urls import path, include
 
 from auto.settings import DEBUG
 
-
-
-
 app_name = 'auto1'
-
-
-
 
 urlpatterns = [
     path('admin/', admin.site.urls),
