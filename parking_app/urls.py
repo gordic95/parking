@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import InParkingViewSet, OutParkingView
 
+napp_name = 'parking_app'
 
 urlpatterns = [
     path('in_parking/', InParkingViewSet.as_view(), name='in_parking'),

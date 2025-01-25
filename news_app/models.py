@@ -21,15 +21,12 @@ class Post(models.Model):
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата редактирования')
     category = models.ForeignKey('Category', on_delete=models.CASCADE, verbose_name='Категория', null=True, blank=True)
     author = models.ForeignKey('Author', on_delete=models.CASCADE, verbose_name='Автор', null=True, blank=True)
-    # images = models.ImageField(null=True, blank=True, verbose_name='Изображение')
+    images = models.ImageField(upload_to='news_app_images/', verbose_name='Изображение', null=True, blank=True)
     slug = models.SlugField(max_length=50, null=True, blank=True, verbose_name='Слаг')
 
 
-
-
-
     def __str__(self):
-        return f'{self.title} {self.created_at}'
+        return f'{self.title} {self.content}'
 
     class Meta:
         db_table = 'posts'
