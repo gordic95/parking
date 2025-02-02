@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os
 from pathlib import Path
+from celery.schedules import crontab
 
 from django.conf.global_settings import MEDIA_URL
 
@@ -91,6 +92,7 @@ DATABASES = {
 }
 
 
+
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
@@ -115,7 +117,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'ru'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
@@ -138,6 +140,23 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10
+}
+
+
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379'   #CELERY_BROKER_URL — указывает на URL брокера сообщений (Redis). По умолчанию он находится на порту 6379.
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379'   #CELERY_RESULT_BACKEND — указывает на хранилище результатов выполнения задач.
+CELERY_ACCEPT_CONTENT = ['application/json']    #CELERY_ACCEPT_CONTENT — допустимый формат данных.
+CELERY_TASK_SERIALIZER = 'json'   #CELERY_TASK_SERIALIZER — метод сериализации задач.
+CELERY_RESULT_SERIALIZER = 'json'    #CELERY_RESULT_SERIALIZER — метод сериализации результатов выполнения задач.
+# CELERY_TIMEZONE = 'UTC'     #CELERY_TIMEZONE — временная зона.
+# CELERY_ENABLE_UTC = True    #CELERY_ENABLE_UTC — указывает на использование временной зоны UTC.
+
+
+CELERY_BEAT_SCHEDULE = {     #CELERY_BEAT_SCHEDULE — список задач, которые будут выполняться каждые 5 минут.
+    'print-all-auto_in_parking': {
+        'task': 'parking_app.tasks.auto_in_parking',
+        'schedule': crontab(minute='*/5'),
+    },
 }
 
 
