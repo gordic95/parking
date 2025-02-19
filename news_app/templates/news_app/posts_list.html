@@ -1,0 +1,14 @@
+{% if posts %}
+        <ul>
+            {% for post in posts %}
+                <li>
+                    <strong>{{ post.title }}</strong><br />
+                    Автор: {{ post.author }}<br />
+                    Дата создания: {{ post.created_at}}
+                    <p>{{ post.content }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Посты отсутствуют.</p>
+    {% endif %}

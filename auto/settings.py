@@ -23,12 +23,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-qp^juc@5)q@*=bt6awd0ahsb2d)3^1t_cq*n5urz2kn!r$@=q='
+SECRET_KEY = os.environ.get('SECRET_KEY', '123')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = True   #os.environ.get('SECRET_KEY', '123').......
 
-ALLOWED_HOSTS = ['127.0.0.1',]
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -85,11 +85,22 @@ WSGI_APPLICATION = 'auto.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # }
+
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get('POSTGRES_DB', default='parking'),
+            'USER': os.environ.get('POSTGRES_USER', default='postgres'),
+            'PASSWORD': os.environ.get('POSTGRES_PASS', default='postgres'),
+            'HOST': os.environ.get('POSTGRES_HOST', default='0.0.0.0'),
+            'PORT': os.environ.get('POSTGRES_PORT', default=5432),
+        }
 }
+
+
 
 
 
@@ -158,6 +169,8 @@ CELERY_BEAT_SCHEDULE = {     #CELERY_BEAT_SCHEDULE — список задач, 
         'schedule': crontab(minute='*/5'),
     },
 }
+
+
 
 
 

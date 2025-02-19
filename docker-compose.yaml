@@ -1,0 +1,52 @@
+---
+version: '3'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: on-failure
+    command: /start.sh
+    environment:
+      - DEBUG=${DEBUG:-True}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-["*"]}
+      - SECRET_KEY=${SECRET_KEY:-django-insecure-qp^juc@5)q@*=bt6awd0ahsb2d)3^1t_cq*n5urz2kn!r$@=q=}
+      - ADMIN_LOGIN=${ADMIN_LOGIN:-admin}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@yandex.ru}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+      - POSTGRES_PASS=${POSTGRES_PASS:-postgres}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-parking}
+      - POSTGRES_PORT=${POSTGRES_PORT:-5432}
+      - BACKEND_HOST=${BACKEND_HOST:-http://0.0.0.0:8000}
+      - POSTGRES_HOST=postgres
+      - DATABASE=postgres
+
+    depends_on:
+      - postgres
+    links:
+      - postgres
+    ports:
+      - "8000:8000"
+    networks:
+      - parking_network
+    volumes:
+      - ./:/my_code
+
+  postgres:
+    image: postgres:alpine
+    restart: on-failure
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASS:-postgres}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-parking}
+    ports:
+      - "5432:5432"
+    networks:
+      - parking_network
+
+networks:
+  parking_network:
+    external: false
+    driver: bridge

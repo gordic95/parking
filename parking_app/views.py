@@ -1,19 +1,19 @@
+from datetime import datetime, timedelta
+
 from rest_framework import viewsets, generics, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.status import HTTP_400_BAD_REQUEST
 
 from .constants import ONE_HOUR_COST, MORE_ONE_HOUR_COST, NUMBER_PLACE_BOOL
-from .models import Parking
-from .serializers import ParkingSerializer
+from .models import Parking, PenaltyOnCar
+from .serializers import ParkingSerializer, PenaltyOnCarSerializer
 from rest_framework.response import Response
 from django.utils import timezone
-
 
 
 class InParkingViewSet(generics.ListCreateAPIView): #въезд машины
     queryset = Parking.objects.all()
     serializer_class = ParkingSerializer
-
 
     def create(self, request, *args, **kwargs):
         """Регистрация вьезда авто на парковку"""
@@ -46,13 +46,11 @@ class InParkingViewSet(generics.ListCreateAPIView): #въезд машины
     def perform_create(self, serializer):
         serializer.save()
 
-
     def save(self, request, *args, **kwargs):
         """Сохраниние данных в БД."""
         if self.request.method == 'POST':
             self.clean(request, *args, **kwargs)
         return super().save(request, *args, **kwargs)
-
 
 
     def clean(self, request, *args, **kwargs):
@@ -63,7 +61,12 @@ class InParkingViewSet(generics.ListCreateAPIView): #въезд машины
         return super().clean(request, *args, **kwargs)
 
 
-
+    def checking_the_time(self):
+            """Проверка времени на парковке."""
+            if datetime.now() - self.time_in > timedelta(hours=1):
+                print('сработала функция')
+                return True
+            return False
 
 class OutParkingView(generics.RetrieveUpdateDestroyAPIView): #выезд машины
     queryset = Parking.objects.all()
@@ -94,6 +97,30 @@ class OutParkingView(generics.RetrieveUpdateDestroyAPIView): #выезд маш�
         instance.time_out = timezone.now()  #меняем время выезда на время, которое сейчас
         NUMBER_PLACE_BOOL[instance.number_place] = False   #освобождаем место на парковке нашей  воображаемой БД
         instance.save() #сохраняем
-        money = instance.calculate_money()   #применяем метод для расчет оплаты
+        money = instance.calculate_money()   #применяем метод для расчета оплаты
         return Response({'message': f'Выезд разрешен. Сумма к оплате: {money} руб. Место {instance.number_place} освободилось'}, status=status.HTTP_200_OK)
+
+
+# class PenaltyListView(generics.ListCreateAPIView):
+#     queryset = PenaltyOnCar.objects.all()
+#     serializer_class = PenaltyOnCarSerializer
+#     lookup_field = 'pk'
+#
+#     def get(self, request, *args, **kwargs):
+#         """Получаем все штрафы"""
+#         queryset = self.get_queryset()
+#         serializer = self.get_serializer(queryset, many=True)
+#         return Response(serializer.data, status=status.HTTP_200_OK)
+#
+#
+# class PenaltyDetailsView(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = PenaltyOnCar.objects.all()
+#     serializer_class = PenaltyOnCarSerializer
+#     lookup_field = 'pk'
+
+
+
+
+
+
 
