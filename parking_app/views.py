@@ -5,10 +5,12 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.status import HTTP_400_BAD_REQUEST
 
 from .constants import ONE_HOUR_COST, MORE_ONE_HOUR_COST, NUMBER_PLACE_BOOL
-from .models import Parking, PenaltyOnCar
-from .serializers import ParkingSerializer, PenaltyOnCarSerializer
+from .models import Parking, PenaltyOnCar, Car, CarPenalty
+from .serializers import ParkingSerializer, CarSerializer, CarPenaltySerializer
 from rest_framework.response import Response
 from django.utils import timezone
+
+
 
 
 class InParkingViewSet(generics.ListCreateAPIView): #въезд машины
@@ -100,23 +102,28 @@ class OutParkingView(generics.RetrieveUpdateDestroyAPIView): #выезд маш�
         money = instance.calculate_money()   #применяем метод для расчета оплаты
         return Response({'message': f'Выезд разрешен. Сумма к оплате: {money} руб. Место {instance.number_place} освободилось'}, status=status.HTTP_200_OK)
 
+class OnePayPenalty(generics.RetrieveUpdateAPIView):  #оплата одного штрафа одой машины
+    queryset = CarPenalty.objects.all()
+    serializer_class = CarPenaltySerializer
+    lookup_field = 'pk'
 
-# class PenaltyListView(generics.ListCreateAPIView):
-#     queryset = PenaltyOnCar.objects.all()
-#     serializer_class = PenaltyOnCarSerializer
-#     lookup_field = 'pk'
-#
-#     def get(self, request, *args, **kwargs):
-#         """Получаем все штрафы"""
-#         queryset = self.get_queryset()
-#         serializer = self.get_serializer(queryset, many=True)
-#         return Response(serializer.data, status=status.HTTP_200_OK)
-#
-#
-# class PenaltyDetailsView(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = PenaltyOnCar.objects.all()
-#     serializer_class = PenaltyOnCarSerializer
-#     lookup_field = 'pk'
+    def put(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.penalty.pay_penalty = True
+        instance.penalty.save()
+        return Response({'message': 'Штраф оплачен'}, status=status.HTTP_200_OK)
+
+
+class AllPayPenalty(generics.RetrieveUpdateDestroyAPIView):  #оплата всех штрафов машины
+    queryset = CarPenalty.objects.all()
+    serializer_class = CarSerializer
+    lookup_field = 'pk'
+
+
+
+
+
+
 
 
 

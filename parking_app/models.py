@@ -7,13 +7,21 @@ class Car(models.Model):
     number = models.CharField(max_length=10, unique=True, verbose_name='Номер машины', null=True, blank=True)
 
 
+
+    def __str__(self) -> str:
+        return self.number
+
+    class Meta():
+        verbose_name = 'Машина'
+        verbose_name_plural = 'Машины'
+
+
 class Parking(models.Model):
-    car_number = models.ForeignKey(Car, on_delete=models.CASCADE, null=True, blank=True, related_name='numbers')
+    car_number = models.OneToOneField('Car', on_delete=models.CASCADE, null=True, blank=True, related_name='car_number')
     time_in = models.DateTimeField(auto_now_add=True, verbose_name='Время въезда')
     time_out = models.DateTimeField(null=True, blank=True, verbose_name='Время выезда')
     pay = models.BooleanField(default=False, verbose_name='Оплата')
     number_place = models.PositiveIntegerField(null=True, blank=True, unique=True,validators=[MaxValueValidator(500)], verbose_name='Номер места')
-    penalty = models.ForeignKey('PenaltyOnCar', on_delete=models.CASCADE, null=True, blank=True, verbose_name='штраф', related_name='penalty')
 
 
     def __str__(self):
@@ -35,6 +43,18 @@ class PenaltyOnCar(models.Model):
     class Meta:
         verbose_name = 'Штраф'
         verbose_name_plural = 'Штрафы'
+
+
+class CarPenalty(models.Model):
+    car = models.ForeignKey('Car', on_delete=models.CASCADE, null=True, blank=True, related_name='car_penalty')
+    penalty = models.ForeignKey('PenaltyOnCar', on_delete=models.CASCADE, null=True, blank=True, related_name='penalty_car')
+
+    def __str__(self):
+        return f'Номер машины: {self.car} Номер штрафа: {self.penalty}'
+
+    class Meta:
+        verbose_name = 'Машина штраф'
+        verbose_name_plural = 'Машины штрафы'
 
 
 

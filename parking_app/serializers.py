@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Parking, PenaltyOnCar
+from .models import Parking, Car, PenaltyOnCar, CarPenalty
 
 
 class ParkingSerializer(serializers.ModelSerializer):
@@ -8,18 +8,23 @@ class ParkingSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class CarSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Car
+        fields = '__all__'
+
+
+class CarPenaltySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CarPenalty
+        fields = '__all__'
+
+
 class PenaltyOnCarSerializer(serializers.ModelSerializer):
     class Meta:
         model = PenaltyOnCar
         fields = '__all__'
 
-    def create(self, validated_data):
-        return PenaltyOnCar.objects.create(**validated_data)
-
-
-    def update(self, instance, validated_data):
-        instance.pay_penalty = validated_data.get('pay_penalty', instance.pay_penalty)
-        return instance
 
 
 

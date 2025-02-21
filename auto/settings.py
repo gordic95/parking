@@ -168,6 +168,10 @@ CELERY_BEAT_SCHEDULE = {     #CELERY_BEAT_SCHEDULE — список задач, 
         'task': 'parking_app.tasks.auto_in_parking',
         'schedule': crontab(minute='*/5'),
     },
+    'added_new_penalty_on_car': {
+        'task': 'parking_app.tasks.pay_or_not_penalty',
+        'schedule': crontab(minute='*/60'),   #это значит каждые 60 минут
+    },
 }
 
 
