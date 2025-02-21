@@ -48,6 +48,7 @@ class InParkingViewSet(generics.ListCreateAPIView): #въезд машины
     def perform_create(self, serializer):
         serializer.save()
 
+
     def save(self, request, *args, **kwargs):
         """Сохраниние данных в БД."""
         if self.request.method == 'POST':
@@ -62,13 +63,6 @@ class InParkingViewSet(generics.ListCreateAPIView): #въезд машины
             raise ValidationError('Машина с таким номером уже на парковке')
         return super().clean(request, *args, **kwargs)
 
-
-    def checking_the_time(self):
-            """Проверка времени на парковке."""
-            if datetime.now() - self.time_in > timedelta(hours=1):
-                print('сработала функция')
-                return True
-            return False
 
 class OutParkingView(generics.RetrieveUpdateDestroyAPIView): #выезд машины
     queryset = Parking.objects.all()
@@ -102,23 +96,43 @@ class OutParkingView(generics.RetrieveUpdateDestroyAPIView): #выезд маш�
         money = instance.calculate_money()   #применяем метод для расчета оплаты
         return Response({'message': f'Выезд разрешен. Сумма к оплате: {money} руб. Место {instance.number_place} освободилось'}, status=status.HTTP_200_OK)
 
+
 class OnePayPenalty(generics.RetrieveUpdateAPIView):  #оплата одного штрафа одой машины
     queryset = CarPenalty.objects.all()
     serializer_class = CarPenaltySerializer
     lookup_field = 'pk'
 
+
+    def get(self, request, *args, **kwargs):
+        instance = self.get_object()
+        count_penalty = CarPenalty.objects.filter(car=instance.car).count()
+        if count_penalty % 10 == 1:
+            end : str = ''
+        if count_penalty % 10 in [2, 3, 4]:
+            end : str = 'а'
+        if count_penalty % 10 in [5, 6, 7, 8, 9, 10, 0]:
+            end : str = 'оф'
+        if count_penalty == 0:
+            end :str = 'ов'
+        return Response({'message': f'Уважаемый владелец автомобиля {instance.car}. У вас {count_penalty} штраф{end}'}, status=status.HTTP_200_OK)
+
+
     def put(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.penalty.pay_penalty = True
         instance.penalty.save()
-        return Response({'message': 'Штраф оплачен'}, status=status.HTTP_200_OK)
+        return Response({'message': f'Штраф № {instance.penalty.number_penalty} оплачен'}, status=status.HTTP_200_OK)
 
 
-class AllPayPenalty(generics.RetrieveUpdateDestroyAPIView):  #оплата всех штрафов машины
+class AllPayPenalty(generics.UpdateAPIView, generics.ListAPIView):  #оплата всех штрафов машины
     queryset = CarPenalty.objects.all()
-    serializer_class = CarSerializer
-    lookup_field = 'pk'
+    serializer_class = CarPenaltySerializer
 
+    def get(self, request, *args, **kwargs):
+        pass
+
+    def put(self, request, *args, **kwargs):
+        pass
 
 
 

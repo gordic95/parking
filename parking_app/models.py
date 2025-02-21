@@ -53,8 +53,8 @@ class CarPenalty(models.Model):
         return f'Номер машины: {self.car} Номер штрафа: {self.penalty}'
 
     class Meta:
-        verbose_name = 'Машина штраф'
-        verbose_name_plural = 'Машины штрафы'
+        verbose_name = 'Штраф на машину'
+        verbose_name_plural = 'Штрафы на машины'
 
 
 

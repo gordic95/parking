@@ -50,3 +50,28 @@ networks:
   parking_network:
     external: false
     driver: bridge
+
+#  celery:
+#    build:
+#    command: celery -A parking worker -l info
+#    environment:
+#      - DEBUG=${DEBUG:-True}
+#      - SECRET_KEY=${SECRET_KEY:-django-insecure-qp^juc@5)q@*=bt6awd0ahsb2d)3^1t_cq*n5urz2kn!r$@=q=}
+#      - DJANGO_ALLOWED_HOSTS = ['*']
+#      - CELERY_BROKER = redis://redis:6379/0
+#      - CELERY_BACKEND = redis://redis:6379/0
+#    depends_on:
+#      - redis
+#
+#
+#  redis:
+#    image: redis:alpine
+#    restart: on-failure
+#    ports:
+#      - "6379:6379"
+#    environment:
+#      - REDIS_PASSWORD=${REDIS_PASS:-redis}
+#      - REDIS_PORT=6379
+#      - REDIS_DATABASE=16
+
+
