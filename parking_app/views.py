@@ -11,8 +11,6 @@ from rest_framework.response import Response
 from django.utils import timezone
 
 
-
-
 class InParkingViewSet(generics.ListCreateAPIView): #въезд машины
     queryset = Parking.objects.all()
     serializer_class = ParkingSerializer
@@ -103,7 +101,7 @@ class OnePayPenalty(generics.RetrieveUpdateAPIView):  #оплата одного
     lookup_field = 'pk'
 
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs) -> Response:
         instance = self.get_object()
         count_penalty = CarPenalty.objects.filter(car=instance.car).count()
         if count_penalty % 10 == 1:
@@ -113,26 +111,45 @@ class OnePayPenalty(generics.RetrieveUpdateAPIView):  #оплата одного
         if count_penalty % 10 in [5, 6, 7, 8, 9, 10, 0]:
             end : str = 'оф'
         if count_penalty == 0:
-            end :str = 'ов'
-        return Response({'message': f'Уважаемый владелец автомобиля {instance.car}. У вас {count_penalty} штраф{end}'}, status=status.HTTP_200_OK)
+            end : str = 'ов'
+        return Response({'message': f'Уважаемый владелец автомобиля {instance.car}. У вас {count_penalty} штраф{end}. Оплатить выбранный штраф.'}, status=status.HTTP_200_OK)
 
 
-    def put(self, request, *args, **kwargs):
-        instance = self.get_object()
-        instance.penalty.pay_penalty = True
-        instance.penalty.save()
-        return Response({'message': f'Штраф № {instance.penalty.number_penalty} оплачен'}, status=status.HTTP_200_OK)
+    def put(self, request, *args, **kwargs) -> Response:
+            instance: CarPenalty = self.get_object()
+            if instance.penalty.pay_penalty:
+                return Response({'message': 'Штраф уже оплачен'}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                instance.penalty.pay_penalty: bool = True
+                instance.penalty.save()
+                return Response({'message': f'Штраф № {instance.penalty.number_penalty} оплачен'}, status=status.HTTP_200_OK)
 
 
 class AllPayPenalty(generics.UpdateAPIView, generics.ListAPIView):  #оплата всех штрафов машины
     queryset = CarPenalty.objects.all()
     serializer_class = CarPenaltySerializer
+    lookup_field = 'pk'
 
-    def get(self, request, *args, **kwargs):
-        pass
+    def get(self, request, *args, **kwargs) -> Response:
+        queryset: CarPenalty = self.get_queryset()
+        count: int = queryset.count()
+        if count % 10 == 1:
+            end : str = ''
+        if count % 10 in [2, 3, 4]:
+            end : str = 'а'
+        if count % 10 in [5, 6, 7, 8, 9, 10, 0]:
+            end : str = 'оф'
+        return Response({'message': f'Уважаемый владелец автомобиля {queryset[0].car.number} у вас {count} штраф{end}. Оплатить все штрафы.'}, status=status.HTTP_200_OK)
 
-    def put(self, request, *args, **kwargs):
-        pass
+
+    def put(self, request, *args, **kwargs) -> Response:
+        queryset: CarPenalty = self.get_queryset()
+        if queryset.filter(penalty__pay_penalty=True).exists():
+            return Response({'message': 'Штрафы уже оплачены'}, status=status.HTTP_400_BAD_REQUEST)
+        for instance in queryset:
+            instance.penalty.pay_penalty: bool = True
+            instance.penalty.save()
+        return Response({'message': f'Все штрафы на авто с гос. номером {instance.car.number} оплачены'}, status=status.HTTP_200_OK)
 
 
 
