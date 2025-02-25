@@ -6,6 +6,8 @@ from .constants import NUMBER_PENALTY
 from .models import Parking, CarPenalty, PenaltyOnCar
 
 
+
+
 @shared_task
 def auto_in_parking():
     print(Parking.objects.filter(time_in__isnull=False, pay=False))
